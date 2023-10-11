@@ -21,11 +21,9 @@
 import { app, links } from '@/_config.js'
 
 export default {
-  data() {
-    return {
-      title: app.title,
-      links: links
-    }
+  setup() {
+    const title = app.title
+    return { title, links }
   }
 }
 </script>

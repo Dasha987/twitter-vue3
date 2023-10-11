@@ -1,0 +1,51 @@
+$border-radius-size: 14px;
+
+.tweet {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  margin: auto;
+  border-radius: $border-radius-size + 5;
+  position: relative;
+  box-shadow: -1px 15px 30px -12px rgba(50, 50, 50, 0.2);
+}
+
+.tweet-likes-counter {
+  cursor: pointer;
+  user-select: none;
+  margin-top: 14px;
+  font-size: 16px;
+}
+
+.tweet-img__wrapper {
+  display: flex;
+  align-items: center;
+  height: 120px;
+  margin-right: 20px;
+}
+
+.tweet-img {
+  width: 30px;
+  height: 30px;
+}
+
+.tweet-name {
+  display: block;
+  margin-top: 24px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tweet-title {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 26px;
+  color: black;
+  font-weight: 900;
+}
+
+.tweet-body {
+  margin-bottom: 16px;
+}

@@ -19,12 +19,9 @@
 
 <script>
 import { links } from '@/_config.js'
-
 export default {
-  data() {
-    return {
-      links: links
-    }
+  setup() {
+    return { links }
   }
 }
 </script>

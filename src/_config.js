@@ -1,7 +1,7 @@
 //файл с константами
 
 export const app = {
-  title: 'Template'
+  title: 'Twitter'
 }
 export const links = [
   {
