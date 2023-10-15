@@ -19,13 +19,14 @@
       :key="index"
     >
       <Tweet
-        @onClickLike="handleAddLike"
+        @onClickLike="handleAddLike(item)"
         :id="item.id"
-        :name="item.date"
+        :date="item.date"
         :likes="item.likes"
         :imgUrl="item.avatar"
-        >{{ item.body }}</Tweet
       >
+        {{ item.body }}
+      </Tweet>
     </div>
     <button @click="handleModalShow" class="btn btnTweet btnTweetHome">
       Добавить
@@ -37,7 +38,8 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
+import http from '@/http-common'
 import Spinner from '@/components/UI/Spinner'
 import Modal from '@/components/UI/Modal'
 import Tweet from '@/components/UI/Tweet'
@@ -51,40 +53,26 @@ export default {
     TweetForm
   },
   setup() {
-    const data = ref([
-      {
-        id: 1,
-        body: 'Привет',
-        avatar:
-          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
-        likes: 10,
-        date: '10-04-2021'
-      },
-      {
-        id: 2,
-        body: 'Привет, мир',
-        avatar:
-          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
-        likes: 8,
-        date: '14-04-2021'
-      },
-      {
-        id: 3,
-        body: 'Привет, животные',
-        avatar:
-          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
-        likes: 18,
-        date: '10-05-2021'
-      },
-      {
-        id: 4,
-        body: 'Привет, друзья',
-        avatar:
-          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
-        likes: 15,
-        date: '10-06-2021'
-      }
-    ])
+    const isLoading = ref(true)
+
+    const data = ref([])
+    onMounted(() => getTweets())
+    const getTweets = () => {
+      http
+        .get('/tweets.json')
+        .then(res => {
+          const nexData = []
+          if (res.data) {
+            Object.keys(res.data).forEach(key => {
+              const item = res.data[key]
+              nexData.push({ id: key, ...item })
+            })
+          }
+          data.value = nexData
+          isLoading.value = false
+        })
+        .catch(err => console.log(err))
+    }
 
     const sortBy = ref('')
     const dataSortered = computed(() => {
@@ -95,26 +83,34 @@ export default {
       })
     })
 
-    const handleAddLike = id => {
-      console.log(id)
+    const handleAddLike = tweet => {
+      tweet.likes = tweet.likes + 1
+
+      http
+        .put(`/tweets/${tweet.id}.json`, tweet)
+        .then(() => {})
+        .catch(err => console.log(err))
     }
 
+    const tweet = reactive({
+      body: '',
+      avatar: null,
+      likes: 0,
+      date: null
+    })
     const handleAddTweet = body => {
-      data.value.push({
-        id: data.value.length + 1,
-        body,
-        avatar:
-          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
-        likes: 0,
-        date: new Date(Date.now()).toLocaleString()
-      })
-      handleModalShow()
+      tweet.avatar = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${Date.now()}`
+      tweet.date = new Date(Date.now()).toLocaleString()
+      tweet.body = body
+      http
+        .post(`/tweets.json`, tweet)
+        .then(() => {
+          handleModalShow()
+          // getTweets()
+          data.value.push({ ...tweet })
+        })
+        .catch(err => console.log(err))
     }
-
-    const isLoading = ref(true)
-    setTimeout(() => {
-      isLoading.value = false
-    }, 3000)
 
     const isShowModal = ref(false)
     const handleModalShow = () => {

@@ -4,10 +4,10 @@
       <img class="tweet-img" :src="imgUrl" />
     </div>
     <div class="tweet-body">
-      <span class="tweet-name">{{ name }}</span>
+      <span class="tweet-name">{{ date }}</span>
       <slot></slot>
 
-      <p @click="$emit('onClickLike', id)" class="tweet-likes-counter">
+      <p @click="$emit('onClickLike')" class="tweet-likes-counter">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="14"
@@ -35,7 +35,7 @@ export default {
     id: {
       required: true
     },
-    name: {
+    date: {
       type: String,
       required: true
     },
