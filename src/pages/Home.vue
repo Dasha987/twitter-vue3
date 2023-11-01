@@ -7,7 +7,7 @@
       <div class="tweet-menu">
         <label for="sortBy">Сортировать:</label>
         <select v-model="sortBy" name="sortBy">
-          <option value="default"></option>
+          <option value="date">По дате</option>
           <option value="likes">По лайкам</option>
           <option value="body">По содержимому</option>
         </select>
@@ -56,7 +56,10 @@ export default {
     const isLoading = ref(true)
 
     const data = ref([])
-    onMounted(() => getTweets())
+    onMounted(() => {
+      getTweets()
+      getLikes()
+    })
     const getTweets = () => {
       http
         .get('/tweets.json')
@@ -74,7 +77,14 @@ export default {
         .catch(err => console.log(err))
     }
 
-    const sortBy = ref('')
+    let likes = []
+    const getLikes = () => {
+      if (JSON.parse(localStorage.getItem('likes'))) {
+        likes = JSON.parse(localStorage.getItem('likes'))
+      }
+    }
+
+    const sortBy = ref('date')
     const dataSortered = computed(() => {
       return data.value.sort((item, itemNext) => {
         if (item[sortBy.value] > itemNext[sortBy.value]) return 1
@@ -84,8 +94,15 @@ export default {
     })
 
     const handleAddLike = tweet => {
-      tweet.likes = tweet.likes + 1
-
+      const index = likes.findIndex(like => like === String(tweet.id))
+      if (index != -1) {
+        tweet.likes = tweet.likes - 1
+        likes.splice(index, 1)
+      } else {
+        tweet.likes = tweet.likes + 1
+        likes.push(tweet.id)
+      }
+      localStorage.setItem('likes', JSON.stringify(likes))
       http
         .put(`/tweets/${tweet.id}.json`, tweet)
         .then(() => {})
@@ -105,9 +122,8 @@ export default {
       http
         .post(`/tweets.json`, tweet)
         .then(() => {
-          handleModalShow()
-          // getTweets()
           data.value.push({ ...tweet })
+          handleModalShow()
         })
         .catch(err => console.log(err))
     }
